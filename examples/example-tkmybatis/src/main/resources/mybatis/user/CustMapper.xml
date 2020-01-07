@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jyblife.datasource.dao.mapper.CustMapper">
+    <resultMap id="BaseResultMap" type="com.jyblife.datasource.po.Cust">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="phone" jdbcType="CHAR" property="phone" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="pwd" jdbcType="VARCHAR" property="pwd" />
+        <result column="qq" jdbcType="VARCHAR" property="qq" />
+        <result column="wb" jdbcType="VARCHAR" property="wb" />
+        <result column="wx" jdbcType="VARCHAR" property="wx" />
+        <result column="identifier" jdbcType="VARCHAR" property="identifier" />
+        <result column="type" jdbcType="VARCHAR" property="type" />
+        <result column="regist_time" jdbcType="TIMESTAMP" property="registTime" />
+        <result column="login_time" jdbcType="TIMESTAMP" property="loginTime" />
+        <result column="logout_time" jdbcType="TIMESTAMP" property="logoutTime" />
+        <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="src_from" jdbcType="VARCHAR" property="srcFrom" />
+        <result column="sub_src_from" jdbcType="VARCHAR" property="subSrcFrom" />
+        <result column="bstatus" jdbcType="TINYINT" property="bstatus" />
+        <result column="bstatus_time" jdbcType="TIMESTAMP" property="bstatusTime" />
+        <result column="status_time" jdbcType="TIMESTAMP" property="statusTime" />
+        <result column="level" jdbcType="TINYINT" property="level" />
+        <result column="authentic_time" jdbcType="TIMESTAMP" property="authenticTime" />
+        <result column="reg_ip" jdbcType="VARCHAR" property="regIp" />
+        <result column="reg_devid" jdbcType="VARCHAR" property="regDevid" />
+        <result column="authentic" jdbcType="TINYINT" property="authentic" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id,
+        namespace,
+        phone,
+        name,
+        pwd,
+        qq,
+        wb,
+        wx,
+        identifier,
+        type,
+        regist_time,
+        login_time,
+        logout_time,
+        apply_id,
+        status,
+        src_from,
+        sub_src_from,
+        bstatus,
+        bstatus_time,
+        status_time,
+        level,
+        authentic_time,
+        reg_ip,
+        reg_devid,
+        authentic
+    </sql>
+    <select id="selectBySql" resultType="com.jyblife.datasource.po.Cust">
+        ${sql}
+    </select>
+
+</mapper>

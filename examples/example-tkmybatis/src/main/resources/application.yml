@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mysql://172.16.1.13:3306/db_jyb_test?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=CONVERT_TO_NULL
+    username: jiayoubao
+    password: root1234
+    multi:
+      - key: db_message
+        url: jdbc:mysql://172.16.1.13:3306/db_message?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=CONVERT_TO_NULL
+        username: jiayoubao
+        password: root1234
+      - key: db_push
+        url: jdbc:mysql://172.16.1.13:3306/db_push_test?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&allowMultiQueries=true&zeroDateTimeBehavior=CONVERT_TO_NULL
+        username: jiayoubao
+        password: root1234

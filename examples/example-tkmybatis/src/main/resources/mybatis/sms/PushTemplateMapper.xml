@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jyblife.datasource.dao.mapper.PushTemplateMapper">
+    <resultMap id="BaseResultMap" type="com.jyblife.datasource.po.PushTemplate">
+        <id column="tpl_id" jdbcType="INTEGER" property="tplId" />
+        <result column="tpl_name" jdbcType="VARCHAR" property="tplName" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="msg_type" jdbcType="TINYINT" property="msgType" />
+        <result column="msg_center_type" jdbcType="TINYINT" property="msgCenterType" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="tpl_params" jdbcType="VARCHAR" property="tplParams" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="creator" jdbcType="VARCHAR" property="creator" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="status_time" jdbcType="TIMESTAMP" property="statusTime" />
+        <result column="pic_url" jdbcType="VARCHAR" property="picUrl" />
+        <result column="sound" jdbcType="VARCHAR" property="sound" />
+        <result column="thumbnail_url" jdbcType="VARCHAR" property="thumbnailUrl" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        tpl_id,
+        tpl_name,
+        type,
+        msg_type,
+        msg_center_type,
+        title,
+        url,
+        tpl_params,
+        create_time,
+        creator,
+        status,
+        status_time,
+        pic_url,
+        sound,
+        thumbnail_url,
+        text,
+        push_text
+    </sql>
+
+</mapper>
