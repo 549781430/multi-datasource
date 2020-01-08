@@ -74,13 +74,13 @@ public class QueryInvocationMonitor implements Interceptor {
             originalSql = originalSql.substring(index);
         }
         //打印sql信息
-        logger.info("======拦截mapper接口方法:{}", mappedStatementId);
-        logger.info("======执行sql语句:{}", originalSql);
+        logger.info("方法[{}]", mappedStatementId);
+        logger.info("执行[{}]", originalSql);
         // 计算执行 SQL 耗时
         long start = System.currentTimeMillis();
         Object result = invocation.proceed();
-        long timing = System.currentTimeMillis()- start;
-        logger.info("======执行时长:{}毫秒", timing);
+        long timing = System.currentTimeMillis() - start;
+        logger.info("耗时[{}]", timing);
         return result;
     }
 

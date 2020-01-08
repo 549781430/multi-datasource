@@ -4,9 +4,12 @@ import com.jyblife.datasource.annotation.EnableDatasources;
 import com.jyblife.datasource.anotation.TargetDataSource;
 import com.jyblife.datasource.constant.DatasourceConstant;
 import com.jyblife.datasource.constant.XmlMapperData;
+import com.jyblife.datasource.monitor.InvocationMapperMonitor;
+import com.jyblife.datasource.monitor.PrepareInvocationMonitor;
 import com.jyblife.datasource.util.ClassScanner;
 import com.jyblife.datasource.util.XmlUtil;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -180,6 +183,7 @@ public class MultiDataSourceRegister implements BeanFactoryPostProcessor,
                 sqlSessionFactoryBean.setDataSource(dataSource);
                 //设置*mapper.xml路径
                 sqlSessionFactoryBean.setMapperLocations(resouceMap.get(key));
+                sqlSessionFactoryBean.setPlugins(new Interceptor[]{new PrepareInvocationMonitor()});
                 //设置configLocation
                 Resource location = getConfigLocation();
                 if(null != location){
@@ -318,14 +322,21 @@ public class MultiDataSourceRegister implements BeanFactoryPostProcessor,
             }
 
             String basePackage = annoAttrs.getString("basePackage");
-            String mapperLocations = annoAttrs.getString("mapperLocations");
-            configLocation = annoAttrs.getString("configLocation");
+            if(!StringUtils.hasText(basePackage)){
+                basePackage = this.evn.getProperty("mybatis.basePackage");
+            }
             if(!StringUtils.hasText(basePackage)){
                 throw new RuntimeException("EnableDatasource必须配置basePackage属性");
+            }else {
+                InvocationMapperMonitor.mapperPackage = basePackage;
             }
+
+            String mapperLocations = annoAttrs.getString("mapperLocations");
             if(!StringUtils.hasText(mapperLocations)){
                 throw new RuntimeException("EnableDatasource必须配置mapperLocations属性");
             }
+
+            configLocation = annoAttrs.getString("configLocation");
             if(!StringUtils.hasText(configLocation)){
                 logger.warn("EnableDatasource未配置configLocation属性");
             }

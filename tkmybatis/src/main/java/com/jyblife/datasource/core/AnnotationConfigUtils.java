@@ -88,7 +88,7 @@ public abstract class AnnotationConfigUtils {
     private static final boolean jpaPresent;
 
     static {
-        ClassLoader classLoader = org.springframework.context.annotation.AnnotationConfigUtils.class.getClassLoader();
+        ClassLoader classLoader = AnnotationConfigUtils.class.getClassLoader();
         jsr250Present = ClassUtils.isPresent("javax.annotation.Resource", classLoader);
         jpaPresent = ClassUtils.isPresent("javax.persistence.EntityManagerFactory", classLoader) &&
                 ClassUtils.isPresent(PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME, classLoader);
@@ -150,7 +150,7 @@ public abstract class AnnotationConfigUtils {
             RootBeanDefinition def = new RootBeanDefinition();
             try {
                 def.setBeanClass(ClassUtils.forName(PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME,
-                        org.springframework.context.annotation.AnnotationConfigUtils.class.getClassLoader()));
+                        AnnotationConfigUtils.class.getClassLoader()));
             }
             catch (ClassNotFoundException ex) {
                 throw new IllegalStateException(

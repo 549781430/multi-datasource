@@ -32,6 +32,8 @@ public class MapperInvocationMonitor implements Interceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(MapperInvocationMonitor.class.getName());
 
+    private Properties properties;
+
     @Override
     public Object plugin(Object target) {
         return Plugin.wrap(target, this);
@@ -39,6 +41,7 @@ public class MapperInvocationMonitor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
+        this.properties = properties;
     }
 
     @Override
@@ -73,13 +76,13 @@ public class MapperInvocationMonitor implements Interceptor {
             originalSql = originalSql.substring(index);
         }
         //打印sql信息
-        logger.info("======拦截mapper接口方法:{}", mappedStatementId);
-        logger.info("======执行sql语句:{}", originalSql);
+        logger.info("方法[{}]", mappedStatementId);
+        logger.info("执行[{}]", originalSql);
         // 计算执行 SQL 耗时
         long start = System.currentTimeMillis();
         Object result = invocation.proceed();
         long timing = System.currentTimeMillis() - start;
-        logger.info("======执行时长:{}毫秒", timing);
+        logger.info("耗时[{}]", timing);
         return result;
     }
 
@@ -139,7 +142,6 @@ public class MapperInvocationMonitor implements Interceptor {
             if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
                 sql = sql.replaceFirst("\\?",
                         Matcher.quoteReplacement(getParameterValue(parameterObject)));
-
             } else {
                 MetaObject metaObject = configuration
                         .newMetaObject(parameterObject);
@@ -153,8 +155,9 @@ public class MapperInvocationMonitor implements Interceptor {
                                 .getAdditionalParameter(propertyName);
                         sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
                     } else {
+                        //打印出缺失，提醒该参数缺失并防止错位
                         sql = sql.replaceFirst("\\?", "缺失");
-                    }//打印出缺失，提醒该参数缺失并防止错位
+                    }
                 }
             }
         }
@@ -162,7 +165,7 @@ public class MapperInvocationMonitor implements Interceptor {
     }
 
     private static String getParameterValue(Object obj) {
-        String value = null;
+        String value;
         if (obj instanceof String) {
             value = "'" + obj.toString() + "'";
         } else if (obj instanceof Date) {
