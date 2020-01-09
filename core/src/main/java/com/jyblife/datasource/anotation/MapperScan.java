@@ -1,18 +1,13 @@
-package com.jyblife.datasource.annotation;
+package com.jyblife.datasource.anotation;
 
-import com.jyblife.datasource.core.MapperAopRegister;
-import com.jyblife.datasource.core.MultiDataSourceRegister;
 import org.springframework.beans.factory.support.BeanNameGenerator;
-import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Import({MapperAopRegister.class, MultiDataSourceRegister.class})
-@Documented
-@Inherited
-public @interface EnableDatasources {
+@Target(value = ElementType.TYPE)
+@Retention(value = RetentionPolicy.RUNTIME)
+@Inherited // 声明注解具有继承性
+public @interface MapperScan {
 
     String basePackage() default "";
 

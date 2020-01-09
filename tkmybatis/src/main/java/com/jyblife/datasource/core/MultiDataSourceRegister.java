@@ -4,8 +4,6 @@ import com.jyblife.datasource.annotation.EnableDatasources;
 import com.jyblife.datasource.anotation.TargetDataSource;
 import com.jyblife.datasource.constant.DatasourceConstant;
 import com.jyblife.datasource.constant.XmlMapperData;
-import com.jyblife.datasource.monitor.InvocationMapperMonitor;
-import com.jyblife.datasource.monitor.PrepareInvocationMonitor;
 import com.jyblife.datasource.util.ClassScanner;
 import com.jyblife.datasource.util.XmlUtil;
 import org.apache.ibatis.annotations.Mapper;
@@ -183,7 +181,7 @@ public class MultiDataSourceRegister implements BeanFactoryPostProcessor,
                 sqlSessionFactoryBean.setDataSource(dataSource);
                 //设置*mapper.xml路径
                 sqlSessionFactoryBean.setMapperLocations(resouceMap.get(key));
-                sqlSessionFactoryBean.setPlugins(new Interceptor[]{new PrepareInvocationMonitor()});
+                // sqlSessionFactoryBean.setPlugins(new Interceptor[]{});
                 //设置configLocation
                 Resource location = getConfigLocation();
                 if(null != location){
@@ -327,8 +325,6 @@ public class MultiDataSourceRegister implements BeanFactoryPostProcessor,
             }
             if(!StringUtils.hasText(basePackage)){
                 throw new RuntimeException("EnableDatasource必须配置basePackage属性");
-            }else {
-                InvocationMapperMonitor.mapperPackage = basePackage;
             }
 
             String mapperLocations = annoAttrs.getString("mapperLocations");

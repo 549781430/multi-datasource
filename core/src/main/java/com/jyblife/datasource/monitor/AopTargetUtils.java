@@ -7,9 +7,7 @@ import org.springframework.aop.support.AopUtils;
 import java.lang.reflect.Field;
 
 /**
- * Description: 能获取JDK动态代理/CGLIB代理对象代理的目标对象。
- * All Rights Reserved.
- * @version 1.0  2015-6-28 上午9:04:32  by zhangbo01@zuche.com创建
+ * 能获取JDK动态代理/CGLIB代理对象代理的目标对象
  */
 public class AopTargetUtils {
     /**
@@ -30,7 +28,7 @@ public class AopTargetUtils {
         while (AopUtils.isAopProxy(proxy)){
             if (AopUtils.isJdkDynamicProxy(proxy)) {
                 target = getJdkDynamicProxyTargetObject(target);
-            } else { //cglib
+            } else {
                 target = getCglibProxyTargetObject(target);
             }
         }

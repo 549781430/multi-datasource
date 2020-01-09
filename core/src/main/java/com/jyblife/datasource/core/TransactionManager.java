@@ -24,6 +24,10 @@ public class TransactionManager {
 
     public static ThreadLocal<Boolean> openFlag = new ThreadLocal<>();
 
+    public static boolean isOpen(){
+        return openFlag.get();
+    }
+
     public static void putTrasaction(String name) {
 
         if (null != openFlag.get() && openFlag.get()) {
