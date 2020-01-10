@@ -1,5 +1,5 @@
 package com.jyblife.datasource.anotation;
-import com.jyblife.datasource.constant.DatasourceConstant;
+import com.jyblife.datasource.constant.MybatisConstant;
 
 import java.lang.annotation.*;
 
@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface TargetDataSource {
-    String value() default DatasourceConstant.DEFAULT_DATASOURCE;
+    String value() default MybatisConstant.DEFAULT_DATASOURCE;
 }

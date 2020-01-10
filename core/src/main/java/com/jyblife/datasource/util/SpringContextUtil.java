@@ -19,7 +19,6 @@ public class SpringContextUtil implements ApplicationContextAware {
    * @param beanName bean名称
    * @Description: 获取spring容器中的bean, 通过bean名称获取
    * @return: Object 返回Object,需要做强制类型转换
-   * @author: zongf
    * @time: 2018-12-26 10:45:07
    */
   public static Object getBean(String beanName) {
@@ -30,7 +29,6 @@ public class SpringContextUtil implements ApplicationContextAware {
    * @param beanClass bean 类型
    * @Description: 获取spring容器中的bean, 通过bean类型获取
    * @return: T 返回指定类型的bean实例
-   * @author: zongf
    * @time: 2018-12-26 10:46:31
    */
   public static <T> T getBean(Class<T> beanClass) {
@@ -42,7 +40,6 @@ public class SpringContextUtil implements ApplicationContextAware {
    * @param beanClass bean 类型
    * @Description: 获取spring容器中的bean, 通过bean名称和bean类型精确获取
    * @return: T 返回指定类型的bean实例
-   * @author: zongf
    * @time: 2018-12-26 10:47:45
    */
   public static <T> T getBean(String beanName, Class<T> beanClass) {

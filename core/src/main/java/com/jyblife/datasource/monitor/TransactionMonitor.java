@@ -10,13 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-@Component
-@Aspect
+//@Aspect
+//@Component
 public class TransactionMonitor {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionMonitor.class);
 
-    @Pointcut(value = "@annotation(com.jyblife.datasource.anotation.Transaction)")
+    @Pointcut(value = "@annotation(com.jyblife.datasource.anotation.Transactional)")
     public void pointCut(){}
 
     @Around(value = "pointCut()")

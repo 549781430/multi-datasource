@@ -8,9 +8,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.EnvironmentAware;
@@ -24,7 +26,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import tk.mybatis.spring.mapper.MapperFactoryBean;
 
 import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
@@ -34,25 +35,26 @@ import java.util.*;
  * 注册多数据源并完成mapper的扫描和绑定
  */
 @Component
-public class MultiDataSourceRegister extends MapperRegister implements BeanFactoryPostProcessor,
-        ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+public class MultiDataSourceRegister extends MapperRegister implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiDataSourceRegister.class.getName());
-
-    private String configLocation;
-
-    private static String basePackage;
 
     /**
      * 存所有MapperFactoryBean
      */
     public static Map<String, MapperFactoryBean<?>> mapperFactoryBeanMap = new HashMap<>();
 
+    private String configLocation;
+
+    private String basePackage;
+
+    private String mapperLocations;
+
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         this.logger.info("Searching for mappers");
         ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
-        scanner.setMapperProperties(this.env);
+        scanner.setEnvironment(this.env);
         try {
             AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(EnableDatasources.class.getName()));
 
@@ -76,25 +78,25 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
             if (!StringUtils.hasText(this.basePackage)) {
                 this.basePackage = this.env.getProperty("mybatis.basePackage");
             }
-            if (!StringUtils.hasText(this.basePackage)) {
+            if (!StringUtils.hasText(basePackage)) {
                 throw new RuntimeException("EnableDatasource必须配置basePackage属性");
             } else {
                 addBasePackageIntoEnvironment(this.basePackage);
             }
 
-            String mapperLocations = annoAttrs.getString("mapperLocations");
-            if (!StringUtils.hasText(mapperLocations)) {
+            this.mapperLocations = annoAttrs.getString("mapperLocations");
+            if (!StringUtils.hasText(this.mapperLocations)) {
                 throw new RuntimeException("EnableDatasource必须配置mapperLocations属性");
             }
 
             this.configLocation = annoAttrs.getString("configLocation");
             if (!StringUtils.hasText(this.configLocation)) {
-                this.logger.warn("EnableDatasource未配置configLocation属性");
+                logger.warn("EnableDatasource未配置configLocation属性");
             }
 
-            this.loadConfigMap();
-            this.getSqlSessionTemplateAndDataSource(mapperLocations);
-            this.getMapperFactoryBean(this.basePackage);
+            loadConfigMap();
+            getSqlSessionTemplateAndDataSource();
+            getMapperFactoryBean();
 
             List<String> basePackages = new ArrayList<>();
             basePackages.add(this.basePackage);
@@ -115,51 +117,18 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
     }
 
     /**
-     * 获取mapper接口操作的数据库
-     *
-     * @param clazz
-     * @return
-     */
-    public static SqlSessionFactory getSqlSessionFactoryByClass(String clazz) {
-        TargetDataSource targetDataSource = null;
-        try {
-            targetDataSource = Class.forName(clazz).getAnnotation(TargetDataSource.class);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        String name = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
-        return (SqlSessionFactory) beanConfig.get(name + "SqlSessionFactory");
-    }
-
-    /**
-     * 获取mapper接口关联的SqlSessionTemplate
-     *
-     * @param clazz
-     * @return
-     */
-    public static SqlSessionTemplate getSqlSessionTemplateByClass(String clazz) {
-        TargetDataSource targetDataSource = null;
-        try {
-            targetDataSource = Class.forName(clazz).getAnnotation(TargetDataSource.class);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        String name = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
-        return (SqlSessionTemplate) beanConfig.get(name + "SqlSessionTemplate");
-    }
-
-    /**
      * 获取SqlSessionTemplate
      *
      * @return
      * @throws Exception
      */
-    private void getSqlSessionTemplateAndDataSource(String mapperLocations) {
+    private void getSqlSessionTemplateAndDataSource() {
         try {
             Set<Map.Entry<String, Map<String, Object>>> entries = this.configMap.entrySet();
-            this.beanConfig = new HashMap<>(entries.size());
+            beanConfig = new HashMap<>(entries.size());
 
-            Resource[] resources = new PathMatchingResourcePatternResolver().getResources(mapperLocations);
+            Resource[] resources = new PathMatchingResourcePatternResolver().getResources(this.mapperLocations);
+            // 资源文件分钟，此操作比较耗时但节省内存，可以注释
             for (Resource resource : resources) {
                 String database = getAttachDataBase(resource);
                 this.addSource(database, resource);
@@ -198,7 +167,45 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
         }
     }
 
-    private void getMapperFactoryBean(String basePackage) {
+    /**
+     * 获取mapper接口操作的数据库
+     *
+     * @param clazz
+     * @return
+     */
+    public static SqlSessionFactory getSqlSessionFactoryByClass(String clazz) {
+        TargetDataSource targetDataSource = null;
+        try {
+            targetDataSource = Class.forName(clazz).getAnnotation(TargetDataSource.class);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String name = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
+        return (SqlSessionFactory) beanConfig.get(name + "SqlSessionFactory");
+    }
+
+    /**
+     * 获取mapper接口关联的SqlSessionTemplate
+     *
+     * @param clazz
+     * @return
+     */
+    public static SqlSessionTemplate getSqlSessionTemplateByClass(String clazz) {
+        TargetDataSource targetDataSource = null;
+        try {
+            targetDataSource = Class.forName(clazz).getAnnotation(TargetDataSource.class);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String name = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
+        return (SqlSessionTemplate) beanConfig.get(name + "SqlSessionTemplate");
+    }
+
+
+    /**
+     * 扫描包里的mapper接口并完成数据源的绑定
+     */
+    private void getMapperFactoryBean() {
         // 扫描包，获取所有的mapper接口
         Map<String, Class<?>> mapperInterface = null;
         try {
@@ -207,8 +214,8 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
             e.printStackTrace();
         }
         Set<Map.Entry<String, Class<?>>> entries = mapperInterface.entrySet();
+        // 为mapper接口绑定SqlSessionTemplate和SqlSessionFactory
         for (Map.Entry<String, Class<?>> entry : entries) {
-            // 获取接口所操作的数据库
             String name = MybatisConstant.DEFAULT_DATASOURCE;
             Class<?> value = entry.getValue();
             TargetDataSource targetDataSource = value.getAnnotation(TargetDataSource.class);
@@ -216,7 +223,7 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
                 name = targetDataSource.value();
             }
             MapperFactoryBean mapperFactoryBean = new MapperFactoryBean(value);
-            SqlSessionTemplate template = (SqlSessionTemplate) this.beanConfig.get(name + "SqlSessionTemplate");
+            SqlSessionTemplate template = (SqlSessionTemplate) beanConfig.get(name + "SqlSessionTemplate");
             mapperFactoryBean.setMapperInterface(value);
             mapperFactoryBean.setSqlSessionTemplate(template);
             mapperFactoryBean.setSqlSessionFactory(template.getSqlSessionFactory());
@@ -231,7 +238,7 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
      * @param dsMap
      * @return
      */
-    private DataSource buildDataSource(Map<String, Object> dsMap) {
+    private DataSource buildDataSource(Map<String, Object> dsMap) throws ClassNotFoundException {
         try {
             Object type = dsMap.get("type");
             if (type == null)
@@ -239,7 +246,6 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
 
             Class<? extends DataSource> dataSourceType;
             dataSourceType = (Class<? extends DataSource>) Class.forName((String) type);
-
             String driverName = "driver-class-name";
             if (null == dsMap.get("driver-class-name")) {
                 driverName = "driverClassName";
@@ -248,13 +254,12 @@ public class MultiDataSourceRegister extends MapperRegister implements BeanFacto
             String url = dsMap.get("url").toString();
             String username = dsMap.get("username").toString();
             String password = dsMap.get("password").toString();
-
             DataSourceBuilder factory = DataSourceBuilder.create().driverClassName(driverClassName).url(url)
                     .username(username).password(password).type(dataSourceType);
             return factory.build();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            throw e;
         }
-        return null;
     }
 }

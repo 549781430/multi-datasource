@@ -1,6 +1,5 @@
 package com.jyblife.datasource.annotation;
 
-import com.jyblife.datasource.core.MapperAopRegister;
 import com.jyblife.datasource.core.MultiDataSourceRegister;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.annotation.Import;
@@ -9,7 +8,7 @@ import java.lang.annotation.*;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import({MapperAopRegister.class, MultiDataSourceRegister.class})
+@Import({MultiDataSourceRegister.class})
 @Documented
 @Inherited
 public @interface EnableDatasources {

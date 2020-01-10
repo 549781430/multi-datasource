@@ -1,6 +1,5 @@
 package com.jyblife.datasource.monitor;
 
-import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -10,6 +9,7 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,15 +22,14 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 /**
- * 监控sql操作，如果是插入、修改、删除则进入事务管理器
+ * 监控sql查询
  */
 @Intercepts({
-        @Signature(type = StatementHandler.class, method = "batch", args = {Statement.class}),
-        @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})
+        @Signature(type = StatementHandler.class, method = "query", args = {Statement.class, ResultHandler.class})
 })
-public class MapperInvocationMonitor implements Interceptor {
+public class QueryInvocationMonitor implements Interceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(MapperInvocationMonitor.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(QueryInvocationMonitor.class.getName());
 
     private Properties properties;
 
@@ -49,7 +48,7 @@ public class MapperInvocationMonitor implements Interceptor {
         MetaObject metaObject;
         MappedStatement mappedStatement;
         Object parameter = null;
-        if (realTarget(invocation.getTarget()) instanceof RoutingStatementHandler) {
+        if(realTarget(invocation.getTarget()) instanceof RoutingStatementHandler){
             Object target = realTarget(invocation.getTarget());
             //获取metaObject对象
             metaObject = SystemMetaObject.forObject(target);
@@ -57,17 +56,16 @@ public class MapperInvocationMonitor implements Interceptor {
             parameter = metaObject.getValue("delegate.parameterHandler.parameterObject");
         } else {
             mappedStatement = (MappedStatement) invocation.getArgs()[0];
-            if (invocation.getArgs().length > 1) {
+            if(invocation.getArgs().length > 1){
                 parameter = invocation.getArgs()[1];
             }
         }
-        String mappedStatementId = mappedStatement.getId();
-        // 是否打印日志
         String sqlId = mappedStatement.getId();
         BoundSql boundSql = mappedStatement.getBoundSql(parameter);
         Configuration configuration = mappedStatement.getConfiguration();
         //获取真实的sql语句
         String sql = getSql(configuration, boundSql, sqlId, 0);
+        String mappedStatementId = mappedStatement.getId();
         //将原始sql中的空白字符（\s包括换行符，制表符，空格符）替换为" "
         String originalSql = sql.replaceAll("[\\s]+", " ");
         //只获取sql的select/update/insert/delete开头的sql
@@ -76,13 +74,13 @@ public class MapperInvocationMonitor implements Interceptor {
             originalSql = originalSql.substring(index);
         }
         //打印sql信息
-        logger.info("{}", mappedStatementId);
-        logger.info("{}", originalSql);
+        logger.info("方法[{}]", mappedStatementId);
+        logger.info("执行[{}]", originalSql);
         // 计算执行 SQL 耗时
         long start = System.currentTimeMillis();
         Object result = invocation.proceed();
         long timing = System.currentTimeMillis() - start;
-        logger.info("耗时[{}ms]", timing);
+        logger.info("耗时[{}]", timing);
         return result;
     }
 
@@ -142,6 +140,7 @@ public class MapperInvocationMonitor implements Interceptor {
             if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
                 sql = sql.replaceFirst("\\?",
                         Matcher.quoteReplacement(getParameterValue(parameterObject)));
+
             } else {
                 MetaObject metaObject = configuration
                         .newMetaObject(parameterObject);
@@ -155,9 +154,8 @@ public class MapperInvocationMonitor implements Interceptor {
                                 .getAdditionalParameter(propertyName);
                         sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
                     } else {
-                        //打印出缺失，提醒该参数缺失并防止错位
                         sql = sql.replaceFirst("\\?", "缺失");
-                    }
+                    }//打印出缺失，提醒该参数缺失并防止错位
                 }
             }
         }
@@ -165,7 +163,7 @@ public class MapperInvocationMonitor implements Interceptor {
     }
 
     private static String getParameterValue(Object obj) {
-        String value;
+        String value = null;
         if (obj instanceof String) {
             value = "'" + obj.toString() + "'";
         } else if (obj instanceof Date) {
@@ -176,8 +174,9 @@ public class MapperInvocationMonitor implements Interceptor {
             if (obj != null) {
                 value = obj.toString();
             } else {
-                value = "null";
+                value = "";
             }
+
         }
         return value;
     }

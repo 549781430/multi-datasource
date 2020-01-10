@@ -1,6 +1,6 @@
 package com.jyblife.datasource.core;
 
-import com.jyblife.datasource.constant.DatasourceConstant;
+import com.jyblife.datasource.constant.MybatisConstant;
 import com.jyblife.datasource.util.SpringContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +25,14 @@ public class TransactionManager {
     public static ThreadLocal<Boolean> openFlag = new ThreadLocal<>();
 
     public static boolean isOpen(){
-        return openFlag.get();
+        return null == openFlag.get() ? false : openFlag.get();
     }
 
     public static void putTrasaction(String name) {
 
         if (null != openFlag.get() && openFlag.get()) {
             if (StringUtils.isEmpty(name)) {
-                name = DatasourceConstant.DEFAULT_DATASOURCE;
+                name = MybatisConstant.DEFAULT_DATASOURCE;
             }
 
             Stack<DataSourceTransactionManager> dataSourceTransactionManagerStack = dataSourceTransactionManagersLocal.get();
@@ -45,7 +45,7 @@ public class TransactionManager {
             }
             //根据事务名称获取具体的事务
             DataSourceTransactionManager dataSourceTransactionManager = (DataSourceTransactionManager) SpringContextUtil
-                    .getBean(name + DatasourceConstant.DATASOURCE_TRANSACTION_MANAGER_SUBFIX);
+                    .getBean(name + MybatisConstant.DATASOURCE_TRANSACTION_MANAGER_SUBFIX);
             if (!dataSourceTransactionManagerStack.contains(dataSourceTransactionManager)) {
                 TransactionStatus transactionStatus = dataSourceTransactionManager
                         .getTransaction(new DefaultTransactionDefinition());

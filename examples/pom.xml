@@ -11,8 +11,10 @@
 
     <artifactId>examples</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>example-tkmybatis</module>
+        <module>example-mybatis</module>
     </modules>
 
     <dependencies>
