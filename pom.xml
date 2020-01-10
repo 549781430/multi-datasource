@@ -10,11 +10,12 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>tkmybatis</module>
+        <module>mybatis-tk</module>
         <module>mybatis</module>
-        <module>mybatisplus</module>
+        <module>mybatis-plus</module>
         <module>core</module>
         <module>examples</module>
+        <module>transaction-manager-center</module>
     </modules>
 
     <parent>

@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.jyblife.datasource</groupId>
-            <artifactId>tkmybatis</artifactId>
+            <artifactId>mybatis-tk</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * custService
  */
@@ -25,7 +27,7 @@ public class TestService {
     public void update() {
         Cust cust = new Cust();
         cust.setId(1);
-        cust.setName("加油宝金融科技1");
+        cust.setName("加油宝金融科技2");
         custMapper.updateByPrimaryKeySelective(cust);
 
         PushTemplate pushTemplate = new PushTemplate();
@@ -33,6 +35,21 @@ public class TestService {
         pushTemplate.setTplName("中石油BP卡1");
         pushTemplateMapper.updateByPrimaryKeySelective(pushTemplate);
 
+        nestUpdate();
+
+        log.info("嵌套事务");
+    }
+
+    @Transactional
+    public void nestUpdate() {
+        Cust cust = new Cust();
+        cust.setId(2);
+        cust.setName("腾讯推广2");
+        custMapper.updateByPrimaryKeySelective(cust);
+    }
+
+    public List<Cust> selectList() {
+        return custMapper.selectBySql("select * from t_cust limit 1,10");
     }
 }
 

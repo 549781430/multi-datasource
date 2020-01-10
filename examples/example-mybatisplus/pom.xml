@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.jyblife.datasource</groupId>
-            <artifactId>mybatisplus</artifactId>
+            <artifactId>mybatis-plus</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
