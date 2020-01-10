@@ -7,9 +7,12 @@ import com.jyblife.datasource.util.ClassScanner;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.Resource;
@@ -19,11 +22,11 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import tk.mybatis.spring.mapper.MapperFactoryBean;
 
 import javax.sql.DataSource;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 注册多数据源并完成mapper的扫描和绑定
@@ -44,68 +47,85 @@ public class MultiDataSourceRegister extends MapperRegister {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-        this.logger.info("Searching for mappers");
-        ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
-        scanner.setMapperProperties(this.env);
-        try {
-            AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(MapperScan.class.getName()));
-
-            Class<? extends Annotation> annotationClass = annoAttrs.getClass("annotationClass");
-            if (!Annotation.class.equals(annotationClass)) {
-                scanner.setAnnotationClass(annotationClass);
-            } else {
-                scanner.setAnnotationClass(Mapper.class);
-            }
-
-            if (this.resourceLoader != null) {
-                scanner.setResourceLoader(this.resourceLoader);
-            }
-
-            this.multiDatasourceConfigKey = annoAttrs.getString("multiDatasourceConfigKey");
-            if (!StringUtils.hasText(this.multiDatasourceConfigKey)) {
-                this.multiDatasourceConfigKey = MybatisConstant.MULTI_DATASOURCE_CONFIG_KEY;
-            }
-
-            this.basePackage = annoAttrs.getString("basePackage");
-            if (!StringUtils.hasText(this.basePackage)) {
-                this.basePackage = this.env.getProperty("mybatis.basePackage");
-            }
-            if (!StringUtils.hasText(this.basePackage)) {
-                throw new RuntimeException("EnableDatasource必须配置basePackage属性");
-            } else {
-                addBasePackageIntoEnvironment(this.basePackage);
-            }
-
-            String mapperLocations = annoAttrs.getString("mapperLocations");
-            if (!StringUtils.hasText(mapperLocations)) {
-                throw new RuntimeException("EnableDatasource必须配置mapperLocations属性");
-            }
-
-            this.configLocation = annoAttrs.getString("configLocation");
-            if (!StringUtils.hasText(this.configLocation)) {
-                this.logger.warn("EnableDatasource未配置configLocation属性");
-            }
-
-            this.loadConfigMap();
-            this.getSqlSessionTemplateAndDataSource(mapperLocations);
-            this.getMapperFactoryBean(this.basePackage);
-
-            List<String> basePackages = new ArrayList<>();
-            basePackages.add(this.basePackage);
-            for (String pkg : annoAttrs.getStringArray("basePackages")) {
-                if (StringUtils.hasText(pkg)) {
-                    basePackages.add(pkg);
-                }
-            }
-            for (Class<?> clazz : annoAttrs.getClassArray("basePackageClasses")) {
-                basePackages.add(ClassUtils.getPackageName(clazz));
-            }
-
-            scanner.registerFilters();
-            scanner.doScan(StringUtils.toStringArray(basePackages));
-        } catch (IllegalStateException ex) {
-            this.logger.debug("Could not determine auto-configuration package, automatic mapper scanning disabled.", ex);
+        AnnotationAttributes mapperScanAttrs = AnnotationAttributes
+                .fromMap(importingClassMetadata.getAnnotationAttributes(MapperScan.class.getName()));
+        if (mapperScanAttrs != null) {
+            registerBeanDefinitions(mapperScanAttrs, registry);
         }
+    }
+
+    void registerBeanDefinitions(AnnotationAttributes annoAttrs, BeanDefinitionRegistry registry) {
+
+        ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
+
+        Class<? extends Annotation> annotationClass = annoAttrs.getClass("annotationClass");
+        if (!Annotation.class.equals(annotationClass)) {
+            scanner.setAnnotationClass(annotationClass);
+        } else {
+            scanner.setAnnotationClass(Mapper.class);
+        }
+
+        if (this.resourceLoader != null) {
+            scanner.setResourceLoader(this.resourceLoader);
+        }
+
+        Class<?> markerInterface = annoAttrs.getClass("markerInterface");
+        if (!Class.class.equals(markerInterface)) {
+            scanner.setMarkerInterface(markerInterface);
+        }
+
+        Class<? extends BeanNameGenerator> generatorClass = annoAttrs.getClass("nameGenerator");
+        if (!BeanNameGenerator.class.equals(generatorClass)) {
+            scanner.setBeanNameGenerator(BeanUtils.instantiateClass(generatorClass));
+        }
+
+        this.multiDatasourceConfigKey = annoAttrs.getString("multiDatasourceConfigKey");
+        if (!StringUtils.hasText(this.multiDatasourceConfigKey)) {
+            this.multiDatasourceConfigKey = MybatisConstant.MULTI_DATASOURCE_CONFIG_KEY;
+        }
+
+        this.basePackage = annoAttrs.getString("basePackage");
+        if (!StringUtils.hasText(this.basePackage)) {
+            this.basePackage = this.env.getProperty("mybatis.basePackage");
+        }
+        if (!StringUtils.hasText(this.basePackage)) {
+            throw new RuntimeException("EnableDatasource必须配置basePackage属性");
+        } else {
+            addBasePackageIntoEnvironment(this.basePackage);
+        }
+
+        String mapperLocations = annoAttrs.getString("mapperLocations");
+        if (!StringUtils.hasText(mapperLocations)) {
+            throw new RuntimeException("EnableDatasource必须配置mapperLocations属性");
+        }
+
+        this.configLocation = annoAttrs.getString("configLocation");
+        if (!StringUtils.hasText(this.configLocation)) {
+            this.logger.warn("EnableDatasource未配置configLocation属性");
+        }
+
+        this.loadConfigMap();
+        this.getSqlSessionTemplateAndDataSource(mapperLocations);
+        this.getMapperFactoryBean(this.basePackage);
+
+        List<String> basePackages = new ArrayList<>();
+        basePackages.addAll(
+                Arrays.stream(annoAttrs.getStringArray("basePackage"))
+                        .filter(StringUtils::hasText)
+                        .collect(Collectors.toList()));
+
+        basePackages.addAll(
+                Arrays.stream(annoAttrs.getStringArray("basePackages"))
+                        .filter(StringUtils::hasText)
+                        .collect(Collectors.toList()));
+
+        basePackages.addAll(
+                Arrays.stream(annoAttrs.getClassArray("basePackageClasses"))
+                        .map(ClassUtils::getPackageName)
+                        .collect(Collectors.toList()));
+
+        scanner.registerFilters();
+        scanner.doScan(StringUtils.toStringArray(basePackages));
     }
 
     /**

@@ -64,6 +64,9 @@ public class TransactionManager {
      * @return
      */
     public static void open() {
+        if(isOpen()){
+            return;
+        }
         logger.info("open transaction.");
         openFlag.set(true);
         Stack<DataSourceTransactionManager> dataSourceTransactionManagerStack = new Stack<>();

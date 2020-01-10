@@ -24,7 +24,6 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Set;
 
-
 public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
     private boolean addToConfig = true;

@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Import({MultiDataSourceRegister.class})
 @Documented
 @Inherited
-public @interface EnableDatasources {
+public @interface MapperScan {
 
     String basePackage() default "";
 

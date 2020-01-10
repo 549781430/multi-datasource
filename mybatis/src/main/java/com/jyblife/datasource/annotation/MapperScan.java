@@ -1,11 +1,16 @@
-package com.jyblife.datasource.anotation;
+package com.jyblife.datasource.annotation;
 
+import com.jyblife.datasource.constant.MybatisConstant;
+import com.jyblife.datasource.core.MultiDataSourceRegister;
 import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
 
-@Target(value = ElementType.TYPE)
-@Retention(value = RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Import({MultiDataSourceRegister.class})
+@Documented
 @Inherited
 public @interface MapperScan {
 
@@ -14,6 +19,8 @@ public @interface MapperScan {
     String[] basePackages() default {};
 
     Class<?>[] basePackageClasses() default {};
+
+    String multiDatasourceConfigKey() default MybatisConstant.MULTI_DATASOURCE_CONFIG_KEY;
 
     String mapperLocations() default "";
 

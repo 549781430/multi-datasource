@@ -1,12 +1,11 @@
 package com.jyblife.datasource;
-
+import com.baomidou.mybatisplus.spring.boot.starter.MybatisPlusAutoConfiguration;
 import com.jyblife.datasource.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration;
 
-@SpringBootApplication(exclude = MapperAutoConfiguration.class)
+@SpringBootApplication(exclude = MybatisPlusAutoConfiguration.class)
 @MapperScan(
         basePackage = "com.jyblife.datasource.dao.mapper",
         configLocation = "classpath:mybatis/mybatis-config.xml",

@@ -74,25 +74,13 @@ public abstract class MapperRegister implements BeanFactoryPostProcessor, Import
         }
     }
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.env = environment;
-        // 绑定配置器
-        this.binder = Binder.get(environment);
-    }
-
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
-
     public abstract void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry);
 
     public void addBasePackageIntoEnvironment(String basePackage) {
         ConfigurableEnvironment c = (ConfigurableEnvironment) this.env;
         MutablePropertySources m = c.getPropertySources();
         Properties p = new Properties();
-        p.put(MybatisConstant.EXECUTION_MYBATIS_BASEPACKAGE, basePackage);
+        p.put(MybatisConstant.EXECUTION_MYBATIS_BASEPACKAGE_KEY, basePackage);
         m.addFirst(new PropertiesPropertySource(MybatisConstant.ASPECT_MYBATIS_PROPERTIES_NAME, p));
     }
 
@@ -102,7 +90,7 @@ public abstract class MapperRegister implements BeanFactoryPostProcessor, Import
             if (null != resource) {
                 return resource;
             }
-            configLocation = this.env.getProperty("mybatis.configLocation");
+            configLocation = this.env.getProperty(MybatisConstant.MYBATIS_CONFIG_LOCATION_KEY);
             return this.resourceLoader.getResource(configLocation);
         }
         try {
@@ -181,5 +169,17 @@ public abstract class MapperRegister implements BeanFactoryPostProcessor, Import
         } else {
             return annotation.value();
         }
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.env = environment;
+        // 绑定配置器
+        this.binder = Binder.get(environment);
+    }
+
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
     }
 }

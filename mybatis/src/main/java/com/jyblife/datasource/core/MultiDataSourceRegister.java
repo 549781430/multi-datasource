@@ -1,23 +1,17 @@
 package com.jyblife.datasource.core;
 
-import com.jyblife.datasource.annotation.EnableDatasources;
+import com.jyblife.datasource.annotation.MapperScan;
 import com.jyblife.datasource.anotation.TargetDataSource;
 import com.jyblife.datasource.constant.MybatisConstant;
 import com.jyblife.datasource.util.ClassScanner;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -35,7 +29,7 @@ import java.util.*;
  * 注册多数据源并完成mapper的扫描和绑定
  */
 @Component
-public class MultiDataSourceRegister extends MapperRegister implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+public class MultiDataSourceRegister extends MapperRegister  {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiDataSourceRegister.class.getName());
 
@@ -56,7 +50,7 @@ public class MultiDataSourceRegister extends MapperRegister implements ImportBea
         ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
         scanner.setEnvironment(this.env);
         try {
-            AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(EnableDatasources.class.getName()));
+            AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(MapperScan.class.getName()));
 
             Class<? extends Annotation> annotationClass = annoAttrs.getClass("annotationClass");
             if (!Annotation.class.equals(annotationClass)) {
@@ -170,35 +164,35 @@ public class MultiDataSourceRegister extends MapperRegister implements ImportBea
     /**
      * 获取mapper接口操作的数据库
      *
-     * @param clazz
+     * @param mapperClazz
      * @return
      */
-    public static SqlSessionFactory getSqlSessionFactoryByClass(String clazz) {
+    public static Object getSqlSessionFactoryByClass(String mapperClazz) {
         TargetDataSource targetDataSource = null;
         try {
-            targetDataSource = Class.forName(clazz).getAnnotation(TargetDataSource.class);
+            targetDataSource = Class.forName(mapperClazz).getAnnotation(TargetDataSource.class);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String name = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
-        return (SqlSessionFactory) beanConfig.get(name + "SqlSessionFactory");
+        String datasource = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
+        return beanConfig.get(datasource + "SqlSessionFactory");
     }
 
     /**
      * 获取mapper接口关联的SqlSessionTemplate
      *
-     * @param clazz
+     * @param mapperClazz
      * @return
      */
-    public static SqlSessionTemplate getSqlSessionTemplateByClass(String clazz) {
+    public static Object getSqlSessionTemplateByClass(String mapperClazz) {
         TargetDataSource targetDataSource = null;
         try {
-            targetDataSource = Class.forName(clazz).getAnnotation(TargetDataSource.class);
+            targetDataSource = Class.forName(mapperClazz).getAnnotation(TargetDataSource.class);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String name = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
-        return (SqlSessionTemplate) beanConfig.get(name + "SqlSessionTemplate");
+        String datasource = null != targetDataSource ? targetDataSource.value() : MybatisConstant.DEFAULT_DATASOURCE;
+        return beanConfig.get(datasource + "SqlSessionTemplate");
     }
 
 

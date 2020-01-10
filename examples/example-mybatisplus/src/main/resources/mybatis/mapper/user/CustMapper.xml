@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jyblife.datasource.dao.mapper.CustMapper">
+
+    <select id="selectBySql" resultType="com.jyblife.datasource.po.Cust">
+        ${sql}
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.jyblife.datasource.po.Cust">
+        update t_cust
+        set name=#{name}
+        where id=#{id}
+    </update>
+
+</mapper>
