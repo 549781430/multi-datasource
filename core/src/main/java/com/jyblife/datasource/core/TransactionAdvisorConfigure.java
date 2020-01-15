@@ -16,6 +16,11 @@ public class TransactionAdvisorConfigure {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class.getName());
 
+    /**
+     * 事务拦截处理
+     * @param advice
+     * @return
+     */
     @Bean
     public AspectJExpressionPointcutAdvisor transactionAdvisor(MethodInterceptor advice){
         if(logger.isInfoEnabled()){
@@ -27,6 +32,11 @@ public class TransactionAdvisorConfigure {
         return aspectJExpressionPointcutAdvisor;
     }
 
+    /**
+     * 事务提交前处理
+     * @param advice
+     * @return
+     */
     @Bean
     public AspectJExpressionPointcutAdvisor transactionBeforeAdvisor(TransactionBeforeAdvice advice){
         if(logger.isInfoEnabled()){
@@ -38,6 +48,11 @@ public class TransactionAdvisorConfigure {
         return aspectJExpressionPointcutAdvisor;
     }
 
+    /**
+     * 事务提交后处理
+     * @param advice
+     * @return
+     */
     @Bean
     public AspectJExpressionPointcutAdvisor transactionAfterAdvisor(TransactionAfterAdvice advice){
         if(logger.isInfoEnabled()){

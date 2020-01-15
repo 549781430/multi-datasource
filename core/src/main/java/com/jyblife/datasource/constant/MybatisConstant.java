@@ -2,6 +2,9 @@ package com.jyblife.datasource.constant;
 
 public class MybatisConstant {
 
+    // 如配置文件中未指定数据源类型，使用该默认值
+    public static final String DATASOURCE_TYPE_DEFAULT = "org.apache.tomcat.jdbc.pool.DataSource";
+
     public static final String DEFAULT_DATASOURCE = "defaultTargetDataSource";
 
     public static final String DATASOURCE_TRANSACTION_MANAGER_SUBFIX = "DataSourceTransactionManager";

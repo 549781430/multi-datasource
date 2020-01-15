@@ -14,21 +14,21 @@ public class MethodInterceptor implements IntroductionInterceptor {
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        Object ret;
+        String methodName = invocation.getMethod().toString();
         try {
-            if(log.isInfoEnabled()){
-                log.info("方法【{}】开启事务", invocation.getMethod().toString());
-            }
             TransactionManager.open();
-            ret = invocation.proceed();
             if(log.isInfoEnabled()){
-                log.info("方法【{}】事务提交成功", invocation.getMethod().toString());
+                log.info("方法【{}】开启事务", methodName);
             }
+            Object ret = invocation.proceed();
             TransactionManager.commit();
+            if(log.isInfoEnabled()){
+                log.info("方法【{}】事务提交成功", methodName);
+            }
             return ret;
         } catch (Throwable e) {
             TransactionManager.rollback();
-            log.error("方法【{}】处理异常，事务回滚", invocation.getMethod().toString());
+            log.error("方法【{}】处理异常，事务回滚", methodName);
             throw e;
         }
     }

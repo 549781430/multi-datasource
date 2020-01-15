@@ -15,7 +15,6 @@
         <module>mybatis-plus</module>
         <module>core</module>
         <module>examples</module>
-        <module>transaction-manager-centre</module>
         <module>doc</module>
     </modules>
 

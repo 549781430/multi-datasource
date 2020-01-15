@@ -76,13 +76,17 @@ public class MapperInvocationMonitor implements Interceptor {
             originalSql = originalSql.substring(index);
         }
         //打印sql信息
-        logger.info("{}", mappedStatementId);
-        logger.info("{}", originalSql);
+        if(logger.isDebugEnabled()){
+            logger.info("{}", mappedStatementId);
+            logger.info("{}", originalSql);
+        }
         // 计算执行 SQL 耗时
         long start = System.currentTimeMillis();
         Object result = invocation.proceed();
         long timing = System.currentTimeMillis() - start;
-        logger.info("耗时[{}ms]", timing);
+        if(logger.isDebugEnabled()){
+            logger.info("耗时[{}ms]", timing);
+        }
         return result;
     }
 

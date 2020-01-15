@@ -35,8 +35,6 @@ public abstract class MapperRegister implements BeanFactoryPostProcessor, Import
 
     private static Logger logger = LoggerFactory.getLogger(MapperRegister.class);
 
-    // 如配置文件中未指定数据源类型，使用该默认值
-    public static final Object DATASOURCE_TYPE_DEFAULT = "org.apache.tomcat.jdbc.pool.DataSource";
     public static final ConfigurationPropertyNameAliases aliases = new ConfigurationPropertyNameAliases();
 
     static {
