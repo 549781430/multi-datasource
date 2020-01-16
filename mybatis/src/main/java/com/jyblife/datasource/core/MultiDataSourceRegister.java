@@ -123,10 +123,10 @@ public class MultiDataSourceRegister extends MapperRegister  {
 
             Resource[] resources = new PathMatchingResourcePatternResolver().getResources(this.mapperLocations);
             // 资源文件分钟，此操作比较耗时但节省内存，可以注释
-            for (Resource resource : resources) {
-                String database = getAttachDataBase(resource);
-                this.addSource(database, resource);
-            }
+//            for (Resource resource : resources) {
+//                String database = getAttachDataBase(resource);
+//                this.addSource(database, resource);
+//            }
 
             for (Map.Entry<String, Map<String, Object>> entry : entries) {
                 String key = entry.getKey();
@@ -140,7 +140,8 @@ public class MultiDataSourceRegister extends MapperRegister  {
                 //设置dataSource数据源
                 sqlSessionFactoryBean.setDataSource(dataSource);
                 //设置*mapper.xml路径
-                sqlSessionFactoryBean.setMapperLocations(this.resouceMap.get(key));
+                sqlSessionFactoryBean.setMapperLocations(resources);
+//                sqlSessionFactoryBean.setMapperLocations(this.resouceMap.get(key));
                 // sqlSessionFactoryBean.setPlugins(new Interceptor[]{});
                 //设置configLocation
                 Resource location = getConfigLocation(this.configLocation);
