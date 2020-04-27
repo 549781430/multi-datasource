@@ -112,7 +112,7 @@
         </repository>
         <repository>
             <id>base-snapshot</id>
-            <url>http://maven.jtjr.com:81/repository/maven-snapshots/</url>
+            <url>http://maven.jyblife.com/repository/maven-snapshots/</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
