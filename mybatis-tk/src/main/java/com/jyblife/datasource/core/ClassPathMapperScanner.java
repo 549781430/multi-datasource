@@ -139,6 +139,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
                 e.printStackTrace();
             }
             if (clazz.isAnnotationPresent(this.annotationClass)) {
+                logger.info(className);
                 definition.setBeanClass(MultiDataSourceRegister.mapperFactoryBeanMap.get(className).getClass());
                 definition.getPropertyValues().add("sqlSessionFactory", MultiDataSourceRegister.getSqlSessionFactoryByClass(className));
                 definition.getPropertyValues().add("sqlSessionTemplate", MultiDataSourceRegister.getSqlSessionTemplateByClass(className));

@@ -7,7 +7,7 @@
     <groupId>com.jyblife.datasource</groupId>
     <artifactId>multi-datasource</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <modules>
         <module>mybatis-tk</module>
@@ -114,11 +114,11 @@
             <id>base-snapshot</id>
             <url>http://maven.jyblife.com/repository/maven-snapshots/</url>
             <releases>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
                 <updatePolicy>always</updatePolicy>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>

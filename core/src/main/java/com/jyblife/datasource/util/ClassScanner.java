@@ -1,31 +1,49 @@
 package com.jyblife.datasource.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+import java.util.stream.Collectors;
 
 public class ClassScanner {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClassScanner.class.getName());
+
+
     public static Map<String, Class<?>> getMapperInterface(String mapperInterfacePackage) throws Exception {
+        logger.info(mapperInterfacePackage);
         Map<String, Class<?>> classMap = new HashMap<>();
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         //将"."替换成"/"
         String packagePath = mapperInterfacePackage.replace(".", "/");
         URL url = loader.getResource(packagePath);
-        List<String> fileNames = null;
+        List<String> fileNames;
         if (url != null) {
             String type = url.getProtocol();
+            logger.info(type);
             if ("file".equals(type)) {
                 fileNames = getClassNameByFile(url.getPath(), null, true);
+                for (String classPath : fileNames) {
+                    classMap.putAll(getClassByPath(classPath));
+                }
+                return classMap;
+            } else if ("jar".equals(type)) {
+                ClassUtil.getClasses(packagePath).stream().forEach(item -> {
+                    classMap.put(item.getName(), item);
+                });
+                return classMap;
             }
         }
-        for (String classPath : fileNames) {
-            classMap.putAll(getClassByPath(classPath));
-        }
-        return classMap;
+        return null;
     }
 
     /**
@@ -37,9 +55,11 @@ public class ClassScanner {
      * @return
      */
     private static List<String> getClassNameByFile(String filePath, List<String> className, boolean childPackage) {
+        logger.info(filePath);
         List<String> myClassName = new ArrayList<>();
         File file = new File(filePath);
         File[] childFiles = file.listFiles();
+        logger.info("mapper数量：" + childFiles.length);
         for (File childFile : childFiles) {
             if (childFile.isDirectory()) {
                 if (childPackage) {
