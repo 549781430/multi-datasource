@@ -35,9 +35,8 @@ public class ClassUtil {
      * @return
      */
     public static Set<Class<?>> getClasses(String pack) {
-
         // 第一个class类的集合
-        Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
+        Set<Class<?>> classes = new LinkedHashSet<>();
         // 是否循环迭代
         boolean recursive = true;
         // 获取包的名字 并进行替换

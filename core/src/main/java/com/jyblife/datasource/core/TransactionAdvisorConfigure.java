@@ -54,7 +54,7 @@ public class TransactionAdvisorConfigure {
     @Bean
     public AspectJExpressionPointcutAdvisor transactionAfterAdvisor(TransactionAfterAdvice advice){
         if(logger.isInfoEnabled()){
-            logger.info("Init before advisor for transactional annotation.");
+            logger.info("Init after advisor for transactional annotation.");
         }
         AspectJExpressionPointcutAdvisor aspectJExpressionPointcutAdvisor = new AspectJExpressionPointcutAdvisor();
         aspectJExpressionPointcutAdvisor.setExpression("@within(com.jyblife.datasource.anotation.Transactional)||@annotation(com.jyblife.datasource.anotation.Transactional)");
