@@ -1,6 +1,6 @@
 package com.jyblife.datasource.core;
 
-import com.jyblife.datasource.anotation.TargetDataSource;
+import com.jyblife.datasource.annotation.TargetDataSource;
 import com.jyblife.datasource.constant.MybatisConstant;
 import com.jyblife.datasource.util.XmlUtil;
 import org.slf4j.Logger;

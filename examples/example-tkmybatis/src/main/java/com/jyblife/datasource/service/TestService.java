@@ -1,6 +1,6 @@
 package com.jyblife.datasource.service;
 
-import com.jyblife.datasource.anotation.Transactional;
+import com.jyblife.datasource.annotation.Transactional;
 import com.jyblife.datasource.dao.mapper.CustMapper;
 import com.jyblife.datasource.dao.mapper.PushTemplateMapper;
 import com.jyblife.datasource.po.Cust;

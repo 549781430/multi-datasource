@@ -17,13 +17,13 @@ public class MethodInterceptor implements IntroductionInterceptor {
         String methodName = invocation.getMethod().toString();
         try {
             TransactionManager.open();
-            if(log.isInfoEnabled()){
-                log.info("方法【{}】开启事务", methodName);
+            if(log.isDebugEnabled()){
+                log.debug("方法【{}】开启事务", methodName);
             }
             Object ret = invocation.proceed();
             TransactionManager.commit();
-            if(log.isInfoEnabled()){
-                log.info("方法【{}】事务提交成功", methodName);
+            if(log.isDebugEnabled()){
+                log.debug("方法【{}】事务提交成功", methodName);
             }
             return ret;
         } catch (Throwable e) {

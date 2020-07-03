@@ -1,11 +1,11 @@
 package com.jyblife.datasource.core;
 
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.jyblife.datasource.annotation.MapperScan;
-import com.jyblife.datasource.anotation.TargetDataSource;
+import com.jyblife.datasource.annotation.TargetDataSource;
 import com.jyblife.datasource.constant.MybatisConstant;
 import com.jyblife.datasource.util.ClassScanner;
 import org.apache.ibatis.annotations.Mapper;
-import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.slf4j.Logger;
@@ -104,10 +104,6 @@ public class MultiDataSourceRegister extends MapperRegister {
             this.logger.warn("EnableDatasource未配置configLocation属性");
         }
 
-        this.loadConfigMap();
-        this.getSqlSessionTemplateAndDataSource(mapperLocations);
-        this.getMapperFactoryBean(this.basePackage);
-
         List<String> basePackages = new ArrayList<>();
         basePackages.addAll(
                 Arrays.stream(annoAttrs.getStringArray("basePackage"))
@@ -125,6 +121,11 @@ public class MultiDataSourceRegister extends MapperRegister {
                         .collect(Collectors.toList()));
 
         scanner.registerFilters();
+
+        this.loadConfigMap();
+        this.getSqlSessionTemplateAndDataSource(mapperLocations);
+        this.getMapperFactoryBean(basePackages);
+
         scanner.doScan(StringUtils.toStringArray(basePackages));
     }
 
@@ -187,7 +188,7 @@ public class MultiDataSourceRegister extends MapperRegister {
                 DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
                 dataSourceTransactionManager.setDataSource(dataSource);
 
-                SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+                MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
                 //设置dataSource数据源
                 sqlSessionFactoryBean.setDataSource(dataSource);
                 //设置*mapper.xml路径
@@ -213,11 +214,13 @@ public class MultiDataSourceRegister extends MapperRegister {
         }
     }
 
-    private void getMapperFactoryBean(String basePackage) {
+    private void getMapperFactoryBean(List<String> basePackages) {
         // 扫描包，获取所有的mapper接口
-        Map<String, Class<?>> mapperInterface = null;
+        Map<String, Class<?>> mapperInterface = new HashMap<>();
         try {
-            mapperInterface = ClassScanner.getMapperInterface(basePackage);
+            for(String basePackage: basePackages){
+                mapperInterface.putAll(ClassScanner.getMapperInterface(basePackage));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -226,6 +229,10 @@ public class MultiDataSourceRegister extends MapperRegister {
             // 获取接口所操作的数据库
             String name = MybatisConstant.DEFAULT_DATASOURCE;
             Class<?> value = entry.getValue();
+            Mapper mapper = value.getAnnotation(Mapper.class);
+            if(null == mapper){
+                continue;
+            }
             TargetDataSource targetDataSource = value.getAnnotation(TargetDataSource.class);
             if (null != targetDataSource) {
                 name = targetDataSource.value();

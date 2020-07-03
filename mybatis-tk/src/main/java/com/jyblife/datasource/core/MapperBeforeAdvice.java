@@ -1,7 +1,8 @@
 package com.jyblife.datasource.core;
 
-import com.jyblife.datasource.anotation.TargetDataSource;
+import com.jyblife.datasource.annotation.TargetDataSource;
 import com.jyblife.datasource.constant.MybatisConstant;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -9,6 +10,7 @@ import org.springframework.aop.MethodBeforeAdvice;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Component;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -29,7 +31,10 @@ public class MapperBeforeAdvice implements MethodBeforeAdvice {
         String className = genericInterfaces.getTypeName();
         String methodName = className + "." + method.getName();
         Class clazz = Class.forName(className);
-
+        Annotation annotation = clazz.getAnnotation(Mapper.class);
+        if(null == annotation){
+            return;
+        }
         Collection<MappedStatement> mappedStatements;
 
         if(!cache.containsKey(methodName)){

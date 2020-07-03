@@ -1,4 +1,4 @@
-package com.jyblife.datasource.anotation;
+package com.jyblife.datasource.annotation;
 
 import java.lang.annotation.*;
 

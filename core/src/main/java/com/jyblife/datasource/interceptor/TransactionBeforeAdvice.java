@@ -13,8 +13,8 @@ public class TransactionBeforeAdvice implements MethodBeforeAdvice {
     private static final Logger log = LoggerFactory.getLogger(TransactionBeforeAdvice.class);
 
     public void before(Method method, Object[] args, Object o) {
-        if (log.isInfoEnabled()) {
-            log.info("--------------------------------------------------");
+        if (log.isDebugEnabled()) {
+            log.debug("--------------------------------------------------");
         }
     }
 }

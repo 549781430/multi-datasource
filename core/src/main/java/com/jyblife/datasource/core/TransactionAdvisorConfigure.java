@@ -25,7 +25,7 @@ public class TransactionAdvisorConfigure {
             logger.info("Init advisor for transactional annotation.");
         }
         AspectJExpressionPointcutAdvisor aspectJExpressionPointcutAdvisor = new AspectJExpressionPointcutAdvisor();
-        aspectJExpressionPointcutAdvisor.setExpression("@within(com.jyblife.datasource.anotation.Transactional)||@annotation(com.jyblife.datasource.anotation.Transactional)");
+        aspectJExpressionPointcutAdvisor.setExpression("@within(com.jyblife.datasource.annotation.Transactional)||@annotation(com.jyblife.datasource.annotation.Transactional)");
         aspectJExpressionPointcutAdvisor.setAdvice(advice);
         return aspectJExpressionPointcutAdvisor;
     }
@@ -41,7 +41,7 @@ public class TransactionAdvisorConfigure {
             logger.info("Init before advisor for transactional annotation.");
         }
         AspectJExpressionPointcutAdvisor aspectJExpressionPointcutAdvisor = new AspectJExpressionPointcutAdvisor();
-        aspectJExpressionPointcutAdvisor.setExpression("@within(com.jyblife.datasource.anotation.Transactional)||@annotation(com.jyblife.datasource.anotation.Transactional)");
+        aspectJExpressionPointcutAdvisor.setExpression("@within(com.jyblife.datasource.annotation.Transactional)||@annotation(com.jyblife.datasource.annotation.Transactional)");
         aspectJExpressionPointcutAdvisor.setAdvice(advice);
         return aspectJExpressionPointcutAdvisor;
     }
@@ -57,7 +57,7 @@ public class TransactionAdvisorConfigure {
             logger.info("Init after advisor for transactional annotation.");
         }
         AspectJExpressionPointcutAdvisor aspectJExpressionPointcutAdvisor = new AspectJExpressionPointcutAdvisor();
-        aspectJExpressionPointcutAdvisor.setExpression("@within(com.jyblife.datasource.anotation.Transactional)||@annotation(com.jyblife.datasource.anotation.Transactional)");
+        aspectJExpressionPointcutAdvisor.setExpression("@within(com.jyblife.datasource.annotation.Transactional)||@annotation(com.jyblife.datasource.annotation.Transactional)");
         aspectJExpressionPointcutAdvisor.setAdvice(advice);
         return aspectJExpressionPointcutAdvisor;
     }
