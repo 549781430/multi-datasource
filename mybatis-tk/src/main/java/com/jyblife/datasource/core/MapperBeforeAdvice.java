@@ -46,12 +46,15 @@ public class MapperBeforeAdvice implements MethodBeforeAdvice {
         }
         Iterator<MappedStatement> iterator = mappedStatements.iterator();
         while (iterator.hasNext()){
-            MappedStatement statement = iterator.next();
-            if(methodName.equals(statement.getId())){
-                if(SqlCommandType.SELECT != statement.getSqlCommandType()){
-                    TargetDataSource targetDataSource = (TargetDataSource) clazz.getAnnotation(TargetDataSource.class);
-                    String datasource = null == targetDataSource ? MybatisConstant.DEFAULT_DATASOURCE : targetDataSource.value();
-                    TransactionManager.putTrasaction(datasource);
+            Object object = iterator.next();
+            if(object instanceof org.apache.ibatis.mapping.MappedStatement) {
+                MappedStatement statement=(MappedStatement)object;
+                if(methodName.equals(statement.getId())){
+                    if(SqlCommandType.SELECT != statement.getSqlCommandType()){
+                        TargetDataSource targetDataSource = (TargetDataSource) clazz.getAnnotation(TargetDataSource.class);
+                        String datasource = null == targetDataSource ? MybatisConstant.DEFAULT_DATASOURCE : targetDataSource.value();
+                        TransactionManager.putTrasaction(datasource);
+                    }
                 }
             }
         }

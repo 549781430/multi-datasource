@@ -47,21 +47,20 @@ public class ClassScanner {
     /**
      * 读取package下的所有类文件
      *
-     * @param filePath
-     * @param className
-     * @param childPackage
+     * @param packagePath   包路径
+     * @param childPackage  是否扫描子包
      * @return
      */
-    private static List<String> getClassNameByFile(String filePath, List<String> className, boolean childPackage) {
-        logger.info(filePath);
+    private static List<String> getClassNameByPackage(String packagePath, boolean childPackage) {
+        logger.info(packagePath);
         List<String> myClassName = new ArrayList<>();
-        File file = new File(filePath);
+        File file = new File(packagePath);
         File[] childFiles = file.listFiles();
         logger.info("文件数量：" + childFiles.length);
         for (File childFile : childFiles) {
             if (childFile.isDirectory()) {
                 if (childPackage) {
-                    myClassName.addAll(getClassNameByFile(childFile.getPath(), myClassName, childPackage));
+                    myClassName.addAll(getClassNameByPackage(childFile.getPath(), childPackage));
                 }
             } else {
                 String childFilePath = childFile.getPath();
