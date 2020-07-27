@@ -11,6 +11,6 @@
     - example-mybatis
     - example-mybatisplus
     - example-tkmybatis
-- mybatis
-- mybatis-puls
-- mybatis-tk
+- mybatis(2.1.1)
+- mybatis-puls(3.1.2)
+- mybatis-tk(2.0.0)
