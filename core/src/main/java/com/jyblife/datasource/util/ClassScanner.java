@@ -26,18 +26,16 @@ public class ClassScanner {
         //将"."替换成"/"
         String packagePath = mapperInterfacePackage.replace(".", "/");
         URL url = loader.getResource(packagePath);
-        List<String> fileNames;
         if (url != null) {
             String type = url.getProtocol();
-            logger.info(type);
+
             if ("file".equals(type)) {
-                fileNames = getClassNameByFile(url.getPath(), null, true);
-                for (String classPath : fileNames) {
-                    classMap.putAll(getClassByPath(classPath));
-                }
+                ClassUtil.getClasses(mapperInterfacePackage).stream().forEach(item -> {
+                    classMap.put(item.getName(), item);
+                });
                 return classMap;
             } else if ("jar".equals(type)) {
-                ClassUtil.getClasses(packagePath).stream().forEach(item -> {
+                ClassUtil.getClasses(mapperInterfacePackage).stream().forEach(item -> {
                     classMap.put(item.getName(), item);
                 });
                 return classMap;
@@ -49,21 +47,20 @@ public class ClassScanner {
     /**
      * 读取package下的所有类文件
      *
-     * @param filePath
-     * @param className
-     * @param childPackage
+     * @param packagePath   包路径
+     * @param childPackage  是否扫描子包
      * @return
      */
-    private static List<String> getClassNameByFile(String filePath, List<String> className, boolean childPackage) {
-        logger.info(filePath);
+    private static List<String> getClassNameByPackage(String packagePath, boolean childPackage) {
+        logger.info(packagePath);
         List<String> myClassName = new ArrayList<>();
-        File file = new File(filePath);
+        File file = new File(packagePath);
         File[] childFiles = file.listFiles();
-        logger.info("mapper数量：" + childFiles.length);
+        logger.info("文件数量：" + childFiles.length);
         for (File childFile : childFiles) {
             if (childFile.isDirectory()) {
                 if (childPackage) {
-                    myClassName.addAll(getClassNameByFile(childFile.getPath(), myClassName, childPackage));
+                    myClassName.addAll(getClassNameByPackage(childFile.getPath(), childPackage));
                 }
             } else {
                 String childFilePath = childFile.getPath();
@@ -115,8 +112,7 @@ public class ClassScanner {
      * @return
      * @throws Exception
      */
-    private static String getClassAlias(String classPath)
-            throws Exception {
+    private static String getClassAlias(String classPath) {
         String split = "\\/";
         String[] classTmp = classPath.split(split);
         String className = classTmp[classTmp.length - 1];

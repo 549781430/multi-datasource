@@ -1,4 +1,4 @@
-package com.jyblife.datasource.interceptor;
+package com.jyblife.datasource.monitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +14,8 @@ public class TransactionAfterAdvice implements AfterReturningAdvice {
 
     @Override
     public void afterReturning(Object returnValue, Method method, Object[] args, Object target) {
-        if (log.isInfoEnabled()) {
-            log.info("--------------------------------------------------");
+        if (log.isDebugEnabled()) {
+            log.debug("--------------------------------------------------");
         }
     }
 }

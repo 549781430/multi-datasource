@@ -80,6 +80,9 @@ public class TransactionManager {
      * 提交处理方法
      */
     public static void commit() {
+        if(dataSourceTransactionManagersLocal.get().size() < 1){
+            return;
+        }
         logger.info("commit transaction, transaction size {}", dataSourceTransactionManagersLocal.get().size());
         Stack<DataSourceTransactionManager> dataSourceTransactionManagers = dataSourceTransactionManagersLocal.get();
 

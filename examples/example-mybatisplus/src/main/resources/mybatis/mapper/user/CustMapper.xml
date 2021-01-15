@@ -7,11 +7,4 @@
     <select id="selectBySql" resultType="com.jyblife.datasource.po.Cust">
         ${sql}
     </select>
-
-    <update id="updateByPrimaryKeySelective" parameterType="com.jyblife.datasource.po.Cust">
-        update t_cust
-        set name=#{name}
-        where id=#{id}
-    </update>
-
 </mapper>

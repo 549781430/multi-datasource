@@ -1,6 +1,6 @@
 package com.jyblife.datasource.core;
 
-import com.jyblife.datasource.anotation.TargetDataSource;
+import com.jyblife.datasource.annotation.TargetDataSource;
 import com.jyblife.datasource.constant.MybatisConstant;
 import com.jyblife.datasource.util.XmlUtil;
 import org.slf4j.Logger;
@@ -146,7 +146,7 @@ public abstract class MapperRegister implements BeanFactoryPostProcessor, Import
         this.logger.info("正在解析【{}】", resource.getFilename());
         Map<String, Document> namespace;
         try {
-            namespace = XmlUtil.getNamespace(resource.getFile());
+            namespace = XmlUtil.getElement(resource.getFile(),"mapper");
             this.documentMap.putAll(namespace);
         } catch (IOException e) {
             e.printStackTrace();

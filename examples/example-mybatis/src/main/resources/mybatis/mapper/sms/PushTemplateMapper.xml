@@ -39,6 +39,7 @@
         text,
         push_text
     </sql>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.jyblife.datasource.po.PushTemplate">
         update t_push_template
         set tpl_name=#{tplName}

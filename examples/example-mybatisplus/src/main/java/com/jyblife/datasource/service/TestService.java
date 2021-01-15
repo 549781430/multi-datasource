@@ -1,6 +1,6 @@
 package com.jyblife.datasource.service;
 
-import com.jyblife.datasource.anotation.Transactional;
+import com.jyblife.datasource.annotation.Transactional;
 import com.jyblife.datasource.dao.mapper.CustMapper;
 import com.jyblife.datasource.dao.mapper.PushTemplateMapper;
 import com.jyblife.datasource.po.Cust;
@@ -25,7 +25,7 @@ public class TestService {
         Cust cust = new Cust();
         cust.setId(1);
         cust.setName("加油宝金融科技1");
-        custMapper.updateByPrimaryKeySelective(cust);
+        custMapper.updateById(cust);
 
         PushTemplate pushTemplate = new PushTemplate();
         pushTemplate.setTplId(22);

@@ -1,11 +1,13 @@
 package com.jyblife.datasource.po;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@TableName("t_cust")
 public class Cust implements Serializable {
     private Integer id;
 

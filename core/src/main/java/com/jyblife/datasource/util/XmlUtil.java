@@ -20,7 +20,7 @@ public class XmlUtil {
      * @param xmlFile
      * @return
      */
-    public static Map<String,Document> getNamespace(File xmlFile){
+    public static Map<String,Document> getElement(File xmlFile, String tag){
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
         Document doc = null;
@@ -34,7 +34,7 @@ public class XmlUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        NodeList links = doc.getElementsByTagName("mapper");
+        NodeList links = doc.getElementsByTagName(tag);
         Map<String,Document> data = new HashMap<>();
         data.put(links.item(0).getAttributes().item(0).getNodeValue(),doc);
         return data;

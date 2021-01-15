@@ -14,7 +14,7 @@ public interface CustMapper {
 
     List<Cust> selectBySql(@Param("sql") String sql);
 
-    void updateByPrimaryKeySelective(Cust cust);
+    int updateByPrimaryKeySelective(Cust cust);
 }
 
 

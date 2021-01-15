@@ -1,7 +1,6 @@
 package com.jyblife.datasource.util;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -15,19 +14,10 @@ import java.util.jar.JarFile;
 
 
 /**
- * 扫描2包下的所有类
- * <p>Title: ClassUtil.java</p>
- * <p>Description: </p>
- * @author lichao1
- * @date 2018年12月3日
- * @version 1.0
+ * 扫描包下的所有类
  */
 public class ClassUtil {
 
-    private static Set<Class<?>> classList;
-    static {
-        classList = getClasses("com.esri.rest");
-    }
     /**
      * 从包package中获取所有的Class
      *
@@ -35,9 +25,8 @@ public class ClassUtil {
      * @return
      */
     public static Set<Class<?>> getClasses(String pack) {
-
         // 第一个class类的集合
-        Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
+        Set<Class<?>> classes = new LinkedHashSet<>();
         // 是否循环迭代
         boolean recursive = true;
         // 获取包的名字 并进行替换
@@ -108,7 +97,6 @@ public class ClassUtil {
                             }
                         }
                     } catch (IOException e) {
-                        // log.error("在扫描用户定义视图时从jar包获取文件出错");
                         e.printStackTrace();
                     }
                 }
@@ -138,12 +126,8 @@ public class ClassUtil {
             return;
         }
         // 如果存在 就获取包下的所有文件 包括目录
-        File[] dirfiles = dir.listFiles(new FileFilter() {
-            // 自定义过滤规则 如果可以循环(包含子目录) 或则是以.class结尾的文件(编译好的java类文件)
-            public boolean accept(File file) {
-                return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
-            }
-        });
+        // 自定义过滤规则 如果可以循环(包含子目录) 或则是以.class结尾的文件(编译好的java类文件)
+        File[] dirfiles = dir.listFiles(file -> (recursive && file.isDirectory()) || (file.getName().endsWith(".class")));
         // 循环所有文件
         for (File file : dirfiles) {
             // 如果是目录 则继续扫描
@@ -154,26 +138,12 @@ public class ClassUtil {
                 // 如果是java类文件 去掉后面的.class 只留下类名
                 String className = file.getName().substring(0, file.getName().length() - 6);
                 try {
-                    // 添加到集合中去
-                    // classes.add(Class.forName(packageName + '.' +
-                    // className));
-                    // 经过回复同学的提醒，这里用forName有一些不好，会触发static方法，没有使用classLoader的load干净
-                    classes.add(
-                            Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className));
+                    classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className));
                 } catch (ClassNotFoundException e) {
-                    // log.error("添加用户自定义视图类错误 找不到此类的.class文件");
                     e.printStackTrace();
                 }
             }
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(classList);
-        Object[] ts =   classList.toArray();
-        for(Object t:ts){
-            Class<?> tt = (Class<?>) t;
-            System.out.println(tt.getName());
-        }
-    }
 }
